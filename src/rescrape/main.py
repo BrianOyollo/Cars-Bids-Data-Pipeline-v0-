@@ -152,6 +152,7 @@ sfn_client = boto3.client('stepfunctions')
 processed_auctions_bucket = os.getenv('PROCESSED_AUCTIONS_BUCKET')
 raw_auctions_bucket = os.getenv('RAW_AUCTIONS_BUCKET')
 rescrape_bucket_dir = os.getenv('RESCRAPE_BUCKET_DIR')
+print("AWS_REGION:", os.getenv('AWS_DEFAULT_REGION'))
 
 rescrape_obj_path = "/tmp/rescrape/rescrape_object.txt"
 task_token_path = "/tmp/rescrape/task_token.txt"
