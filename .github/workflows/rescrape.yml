@@ -41,4 +41,6 @@ jobs:
                 AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                 AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
                 PROCESSED_AUCTIONS_BUCKET: ${{ secrets.PROCESSED_AUCTIONS_BUCKET }}
+                RAW_AUCTIONS_BUCKET: ${{ secrets.RAW_AUCTIONS_BUCKET }}
+                RESCRAPE_BUCKET_DIR: ${{ secrets.RESCRAPE_BUCKET_DIR }}
           
