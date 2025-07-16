@@ -3,10 +3,10 @@ name: Rescrape Auctions Workflow
 on:
     workflow_dispatch:
         inputs:
-            urls:
-                description: "Comma-separated list of URLs to rescrape"
+            rescrape_obj_key:
+                description: "S3 object key for rescrape URLs file (.txt)"
                 required: true
-            task_token:
+            TaskToken:
                 description: "Step Function task token"
                 required: true
 
@@ -32,8 +32,8 @@ jobs:
               run: |
                 mkdir -p /tmp/rescrape
                 echo "${{ github.event.inputs.rescrape_obj_key }}" > /tmp/rescrape/rescrape_object.txt
-                echo "${{ github.event.inputs.task_token }}" > /tmp/rescrape/task_token.txt
-            
+                echo "${{ github.event.inputs.TaskToken }}" > /tmp/rescrape/task_token.txt
+
             - name: Run Rescrape
               run: uv run src/rescrape/main.py
               env:
