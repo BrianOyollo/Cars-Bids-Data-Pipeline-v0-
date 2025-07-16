@@ -103,7 +103,6 @@ def convert_to_list_dicts(data) -> list:
 
 def create_auction_df(auctions:list):
     df = pd.DataFrame(auctions)
-    print(df.head(10))
     df.columns = df.columns.str.lower().str.replace(" ","_")
     return df
 
@@ -445,11 +444,8 @@ def lambda_handler(event, context):
         return_data = {
             "processed_auctions_bucket": processed_auctions_bucket,
             "uploaded_objects": uploaded_objects,
+            "rescrape_urls" : rescrape_urls
         }
-
-        if rescrape_urls:
-            return_data['rescrape_urls'] = rescrape_urls
-        
 
         return return_data
 

@@ -14,7 +14,8 @@ wheels/
 /packages
 /terraform
 /requirements.txt
-.python-version
+# .python-version
 *.zip
 *.notes
 *.drawio
+*.txt
