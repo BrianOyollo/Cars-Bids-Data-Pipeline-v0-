@@ -19,3 +19,4 @@ wheels/
 *.notes
 *.drawio
 *.txt
+*.json

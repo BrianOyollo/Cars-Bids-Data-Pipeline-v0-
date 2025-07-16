@@ -8,17 +8,8 @@ from datetime import datetime
 import os
 import json
 
+from setup import close_promo_bar
 
-from scraper.setup import driver_setup
-from scraper.setup import driver_teardown
-from scraper.setup import close_promo_bar
-
-
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
 
 def scrape_auction_data(driver, url:str, timeout:int = 30) -> dict:
     """
