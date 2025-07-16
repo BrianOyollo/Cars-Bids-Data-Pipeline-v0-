@@ -31,7 +31,7 @@ jobs:
             - name: Save urls to /tmp/rescrape/urls.txt
               run: |
                 mkdir -p /tmp/rescrape
-                echo "${{ toJSON(github.event.inputs.urls) }}" > /tmp/rescrape/urls.txt
+                echo "${{ github.event.inputs.rescrape_obj_key }}" > /tmp/rescrape/rescrape_object.txt
                 echo "${{ github.event.inputs.task_token }}" > /tmp/rescrape/task_token.txt
             
             - name: Run Rescrape

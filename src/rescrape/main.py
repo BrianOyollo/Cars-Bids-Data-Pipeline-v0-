@@ -9,14 +9,49 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def read_rescrape_urls(inputs_path:str):
-    with open(inputs_path, "r") as f:
-        data = json.load(f)
-    return data
 
-def read_task_token(task_token_path:str):
-    with open(task_token_path, "r") as f:
+def read_txt_from_s3(s3_client, bucket_name: str, key: str) -> list[str]:
+    """
+    Reads a .txt file from S3 and returns a list of lines.
+
+    Parameters:
+    - bucket_name (str): The name of the S3 bucket.
+    - key (str): The key (path) of the .txt file in the bucket.
+
+    Returns:
+    - list of str: Each line from the file as a string (with trailing newline removed).
+    """
+    
+    try:
+        response = s3_client.get_object(Bucket=bucket_name, Key=key)
+        content = response['Body'].read().decode('utf-8')
+        
+        # Split into lines and strip extra whitespace
+        lines = [line.strip() for line in content.splitlines() if line.strip()]
+        return lines
+    
+    except s3_client.exceptions.NoSuchKey:
+        print(f"File not found: s3://{bucket_name}/{key}")
+        return []
+    except Exception as e:
+        print(f"Error reading file from S3: {e}")
+        return []
+
+
+
+def read_inputs(inputs_path:str)->str:
+    """Reads the contents of a text file and returns it as a stripped string.
+
+    Args:
+        inputs_path (str): The file path to the input text file.
+
+    Returns:
+        str:  The content of the file with leading and trailing whitespace removed
+    """
+
+    with open(inputs_path, "r") as f:
         return f.read().strip()
+    
     
 def send_task_success(sfn_client, task_token:str, output:dict):
     # sends a success response to Step Functions
@@ -115,11 +150,15 @@ def rescrape(s3_client, sfn_client, processed_auctions_bucket:str, urls:list, ta
 s3_client = boto3.client('s3')
 sfn_client = boto3.client('stepfunctions')
 processed_auctions_bucket = os.getenv('PROCESSED_AUCTIONS_BUCKET')
+raw_auctions_bucket = os.getenv('RAW_AUCTIONS_BUCKET')
+rescrape_bucket_dir = os.getenv('RESCRAPE_BUCKET_DIR')
 
-inputs_path = "/tmp/rescrape/inputs.txt"
+rescrape_obj_path = "/tmp/rescrape/rescrape_object.txt"
 task_token_path = "/tmp/rescrape/task_token.txt"
 
-task_token = read_task_token(task_token_path)
-urls = read_rescrape_urls(inputs_path)
+task_token = read_inputs(task_token_path)
+obj_key = read_inputs(rescrape_obj_path)
+
+urls = read_txt_from_s3(s3_client, raw_auctions_bucket, obj_key)
 rescrape(s3_client, sfn_client, processed_auctions_bucket, urls, task_token)
 
