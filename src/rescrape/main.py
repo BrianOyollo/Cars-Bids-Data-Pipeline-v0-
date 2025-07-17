@@ -125,7 +125,7 @@ def rescrape(s3_client, sfn_client, processed_auctions_bucket:str, urls:list, ta
         # send task success
         send_task_success(sfn_client, task_token, {
             "bucket": processed_auctions_bucket,
-            "uploaded_objects_keys": uploaded_objects_keys,
+            "uploaded_objects": uploaded_objects_keys,
         })
         
     
