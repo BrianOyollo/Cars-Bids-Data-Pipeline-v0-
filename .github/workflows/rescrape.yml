@@ -43,4 +43,5 @@ jobs:
                 PROCESSED_AUCTIONS_BUCKET: ${{ secrets.PROCESSED_AUCTIONS_BUCKET }}
                 RAW_AUCTIONS_BUCKET: ${{ secrets.RAW_AUCTIONS_BUCKET }}
                 RESCRAPE_BUCKET_DIR: ${{ secrets.RESCRAPE_BUCKET_DIR }}
+                URLS_BUCKET: ${{ secrets.URLS_BUCKET }}
           
