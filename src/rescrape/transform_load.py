@@ -114,7 +114,7 @@ def extract_invalid_auctions(df):
     """
     # Find auctions with valid auction status
     valid_status_mask = (
-        df['auction_status'].str.lower().str.contains('sold|reserve not met|cancelled', na=False)
+        df['auction_status'].str.lower().str.contains('sold|reserve not met|canceled|cancelled', na=False)
     )
     
     # Get URLs of invalid auctions
