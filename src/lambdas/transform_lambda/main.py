@@ -1,4 +1,5 @@
 import json
+import os
 import boto3,botocore
 import pandas as pd
 import numpy as np
@@ -119,7 +120,7 @@ def extract_invalid_auctions(df):
     """
     # Find auctions with valid auction status
     valid_status_mask = (
-        df['auction_status'].str.lower().str.contains('sold|reserve not met|cancelled', na=False)
+        df['auction_status'].str.lower().str.contains('sold|reserve not met|canceled|cancelled', na=False)
     )
     
     # Get URLs of invalid auctions
@@ -407,7 +408,7 @@ def lambda_handler(event, context):
     Expected event format:
     {
         "bucket": "bucket-name",
-        "key": "raw-auctions/filename.json"
+        "key": "filename.json"
     }
 
     Steps:
@@ -416,7 +417,8 @@ def lambda_handler(event, context):
     - Writes transformed file back to S3 (in processed/ folder).
     - Returns rescrape_urls, path to processed_auctions_bucket, uploaded keys for downstream steps.
     """
-    processed_auctions_bucket = "carsnbids-testing-processed"
+    processed_auctions_bucket = os.getenv('PROCESSED_AUCTIONS_BUCKET')
+    raw_auctions_bucket = os.getenv('RAW_AUCTIONS_BUCKET')
 
     try:
         # get bucket and object key
@@ -424,7 +426,7 @@ def lambda_handler(event, context):
         object_key = event['key']
 
         # read the data
-        data = read_json_from_s3(s3_client, bucket, object_key)
+        data = read_json_from_s3(s3_client, raw_auctions_bucket, object_key)
 
         # convert to list of dicts (early auction files were saved as nested dicts)
         data = convert_to_list_dicts(data)
@@ -432,6 +434,13 @@ def lambda_handler(event, context):
         # get clean df and urls to be rescraped
         df = create_auction_df(data)
         valid_df, rescrape_urls = extract_invalid_auctions(df)
+        
+        if valid_df.empty:
+            return {
+                "processed_auctions_bucket": processed_auctions_bucket,
+                "rescrape_urls" : rescrape_urls
+            }
+
 
         # clean and transform valid df
         cleaned_df = clean_and_transform(valid_df)
@@ -441,13 +450,19 @@ def lambda_handler(event, context):
 
         # return processed_auctions_bucket, uploaded keys, rescrape_urls, 
 
-        return_data = {
+        if not rescrape_urls:
+            return {
+                "processed_auctions_bucket": processed_auctions_bucket,
+                "uploaded_objects": uploaded_objects,
+
+            }
+
+        return {
             "processed_auctions_bucket": processed_auctions_bucket,
             "uploaded_objects": uploaded_objects,
             "rescrape_urls" : rescrape_urls
         }
 
-        return return_data
 
     except Exception as e:
         print(f"Pipeline Error: {e}")
