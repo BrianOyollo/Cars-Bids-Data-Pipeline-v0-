@@ -18,6 +18,5 @@ wheels/
 *.zip
 *.notes
 *.drawio
-*.txt
 *.json
 project_state/*
